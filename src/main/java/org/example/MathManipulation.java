@@ -7,9 +7,13 @@ import org.apache.commons.math3.stat.interval.ConfidenceInterval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class MathManipulation {
@@ -20,7 +24,7 @@ public class MathManipulation {
         ArrayList<Double> y = new ArrayList<>();
         ArrayList<Double> z = new ArrayList<>();
 
-        int sheetNumber = 5;
+        int sheetNumber = 6;
 
         try (FileInputStream inputStream = new FileInputStream(filePath)) {
             Workbook workbook = WorkbookFactory.create(inputStream);
@@ -66,14 +70,29 @@ public class MathManipulation {
             System.out.println(calculateRange(sample));
             System.out.println(calculateArrayLength(sample));
             System.out.println(calculateCoefficientOfVariation(sample));
-            System.out.println(calculateConfidenceInterval(sample,0.1));
+            System.out.println(calculateConfidenceInterval(sample,0.05));
             System.out.println(calculateVariance(sample));
             System.out.println(calculateMinimum(sample));
             System.out.println(calculateMaximum(sample));
 
         });
         System.out.println("==================");
-        System.out.println(calculateCovariance(samples.get(0), samples.get(1), samples.get(2) ));
+        double[][] covXY = calculateCovariance(samples.get(0), samples.get(1));
+        Arrays.stream(covXY).forEach(row -> {
+            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
+            System.out.println();
+        });
+        double[][] covXZ = calculateCovariance(samples.get(0), samples.get(2));
+        Arrays.stream(covXZ).forEach(row -> {
+            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
+            System.out.println();
+        });
+        double[][] covYZ = calculateCovariance(samples.get(1), samples.get(2));
+        Arrays.stream(covYZ).forEach(row -> {
+            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
+            System.out.println();
+        });
+
 
     }
     //1.	Рассчитать среднее геометрическое для каждой выборки
@@ -94,8 +113,8 @@ public class MathManipulation {
         return StatUtils.max(array) - StatUtils.min(array);
     }
     //5.	Рассчитать коэффициенты ковариации для всех пар случайных чисел
-    public double[][] calculateCovariance(double[] x, double[] y, double[] z) {
-        Covariance covariance = new Covariance(new double[][] {x, y, z});
+    public double[][] calculateCovariance(double[] x, double[] y) {
+        Covariance covariance = new Covariance(new double[][] {x, y});
         return covariance.getCovarianceMatrix().getData();
     }
     //6.	Рассчитать количество элементов в каждой выборке
@@ -132,6 +151,62 @@ public class MathManipulation {
         return StatUtils.max(array);
     }
 
+    public void writeResultsToExcel(String filePath) throws IOException {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Results");
+
+        int rowIndex = 0;
+        Row headerRow = sheet.createRow(rowIndex++);
+        headerRow.createCell(0).setCellValue("Sample");
+        headerRow.createCell(1).setCellValue("Geometric mean");
+        headerRow.createCell(2).setCellValue("Arithmetic mean");
+        headerRow.createCell(3).setCellValue("Standard deviation");
+        headerRow.createCell(4).setCellValue("Range");
+        headerRow.createCell(5).setCellValue("Array length");
+        headerRow.createCell(6).setCellValue("Coefficient of variation");
+        headerRow.createCell(7).setCellValue("Confidence interval");
+        headerRow.createCell(8).setCellValue("Variance");
+        headerRow.createCell(9).setCellValue("Minimum");
+        headerRow.createCell(10).setCellValue("Maximum");
+
+        String[] names = {"X","Y","Z"};
+        int nameIndex = 0;
+        for (double[] sample : samples) {
+            Row dataRow = sheet.createRow(rowIndex++);
+            dataRow.createCell(0).setCellValue(names[nameIndex]);
+            dataRow.createCell(1).setCellValue(String.valueOf(calculateGeometricMean(sample)));
+            dataRow.createCell(2).setCellValue(calculateArithmeticMean(sample));
+            dataRow.createCell(3).setCellValue(calculateStandardDeviation(sample));
+            dataRow.createCell(4).setCellValue(calculateRange(sample));
+            dataRow.createCell(5).setCellValue(calculateArrayLength(sample));
+            dataRow.createCell(6).setCellValue(calculateCoefficientOfVariation(sample));
+            dataRow.createCell(7).setCellValue(String.valueOf(calculateConfidenceInterval(sample, 0.05)));
+            dataRow.createCell(8).setCellValue(calculateVariance(sample));
+            dataRow.createCell(9).setCellValue(calculateMinimum(sample));
+            dataRow.createCell(10).setCellValue(calculateMaximum(sample));
+            nameIndex++;
+        }
+
+/*
+        Row covarianceRow = sheet.createRow(rowIndex);
+        covarianceRow.createCell(0).setCellValue("Covariance");
+        covarianceRow.createCell(1).setCellValue(calculateCovariance(samples.get(0), samples.get(1)));
+*/
+
+        // Auto-size columns
+        for (int i = 0; i < 11; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Write the output to a file
+        FileOutputStream fileOut = new FileOutputStream(filePath);
+        workbook.write(fileOut);
+        fileOut.close();
+
+        // Close the workbook
+        workbook.close();
+
+    }
 
 
 }
