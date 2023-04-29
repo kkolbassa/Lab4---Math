@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MathManipulation {
-    ArrayList<double[]> samples = new ArrayList<>();
+    private ArrayList<double[]> samples = new ArrayList<>();
 
     public void setData(String filePath) throws IOException {
         ArrayList<Double> x = new ArrayList<>();
