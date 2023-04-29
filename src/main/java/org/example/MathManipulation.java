@@ -13,8 +13,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MathManipulation {
     ArrayList<double[]> samples = new ArrayList<>();
@@ -24,7 +24,7 @@ public class MathManipulation {
         ArrayList<Double> y = new ArrayList<>();
         ArrayList<Double> z = new ArrayList<>();
 
-        int sheetNumber = 6;
+        int sheetNumber = 5;
 
         try (FileInputStream inputStream = new FileInputStream(filePath)) {
             Workbook workbook = WorkbookFactory.create(inputStream);
@@ -61,40 +61,7 @@ public class MathManipulation {
             ex.printStackTrace();
         }
     }
-    public void calculateAll(){
-        samples.forEach(sample ->{
-            System.out.println("==================");
-            System.out.println(calculateGeometricMean(sample));
-            System.out.println(calculateArithmeticMean(sample));
-            System.out.println(calculateStandardDeviation(sample));
-            System.out.println(calculateRange(sample));
-            System.out.println(calculateArrayLength(sample));
-            System.out.println(calculateCoefficientOfVariation(sample));
-            System.out.println(calculateConfidenceInterval(sample,0.05));
-            System.out.println(calculateVariance(sample));
-            System.out.println(calculateMinimum(sample));
-            System.out.println(calculateMaximum(sample));
 
-        });
-        System.out.println("==================");
-        double[][] covXY = calculateCovariance(samples.get(0), samples.get(1));
-        Arrays.stream(covXY).forEach(row -> {
-            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
-            System.out.println();
-        });
-        double[][] covXZ = calculateCovariance(samples.get(0), samples.get(2));
-        Arrays.stream(covXZ).forEach(row -> {
-            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
-            System.out.println();
-        });
-        double[][] covYZ = calculateCovariance(samples.get(1), samples.get(2));
-        Arrays.stream(covYZ).forEach(row -> {
-            Arrays.stream(row).forEach(element -> System.out.print(element + " "));
-            System.out.println();
-        });
-
-
-    }
     //1.	Рассчитать среднее геометрическое для каждой выборки
     public double calculateGeometricMean(double[] array) {
         return StatUtils.geometricMean(array);
@@ -114,8 +81,11 @@ public class MathManipulation {
     }
     //5.	Рассчитать коэффициенты ковариации для всех пар случайных чисел
     public double[][] calculateCovariance(double[] x, double[] y) {
-        Covariance covariance = new Covariance(new double[][] {x, y});
-        return covariance.getCovarianceMatrix().getData();
+        if(x.length==y.length){
+            Covariance covariance = new Covariance(new double[][] {x, y});
+            return covariance.getCovarianceMatrix().getData();
+        }
+        return null;
     }
     //6.	Рассчитать количество элементов в каждой выборке
     public int calculateArrayLength(double[] array) {
@@ -155,8 +125,8 @@ public class MathManipulation {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Results");
 
-        int rowIndex = 0;
-        Row headerRow = sheet.createRow(rowIndex++);
+        AtomicInteger rowIndex = new AtomicInteger();
+        Row headerRow = sheet.createRow(rowIndex.getAndIncrement());
         headerRow.createCell(0).setCellValue("Sample");
         headerRow.createCell(1).setCellValue("Geometric mean");
         headerRow.createCell(2).setCellValue("Arithmetic mean");
@@ -172,7 +142,7 @@ public class MathManipulation {
         String[] names = {"X","Y","Z"};
         int nameIndex = 0;
         for (double[] sample : samples) {
-            Row dataRow = sheet.createRow(rowIndex++);
+            Row dataRow = sheet.createRow(rowIndex.getAndIncrement());
             dataRow.createCell(0).setCellValue(names[nameIndex]);
             dataRow.createCell(1).setCellValue(String.valueOf(calculateGeometricMean(sample)));
             dataRow.createCell(2).setCellValue(calculateArithmeticMean(sample));
@@ -187,25 +157,33 @@ public class MathManipulation {
             nameIndex++;
         }
 
-/*
-        Row covarianceRow = sheet.createRow(rowIndex);
-        covarianceRow.createCell(0).setCellValue("Covariance");
-        covarianceRow.createCell(1).setCellValue(calculateCovariance(samples.get(0), samples.get(1)));
-*/
-
-        // Auto-size columns
         for (int i = 0; i < 11; i++) {
             sheet.autoSizeColumn(i);
         }
 
-        // Write the output to a file
+        double[][] covXY = calculateCovariance(samples.get(0), samples.get(1));
+        if(covXY!=null) writeArrayToExcel(covXY,workbook,"Cov XY");
+        double[][] covXZ = calculateCovariance(samples.get(0), samples.get(2));
+        if(covXY!=null) writeArrayToExcel(covXZ,workbook,"Cov XZ");
+        double[][] covYZ = calculateCovariance(samples.get(1), samples.get(2));
+        if(covXY!=null) writeArrayToExcel(covYZ,workbook,"Cov YZ");
+
         FileOutputStream fileOut = new FileOutputStream(filePath);
         workbook.write(fileOut);
         fileOut.close();
 
-        // Close the workbook
         workbook.close();
 
+    }
+    public void writeArrayToExcel(double[][] array, Workbook workbook, String sheetname) {
+        Sheet sheet = workbook.createSheet(sheetname);
+        for (int rowIndex = 0; rowIndex < array.length; rowIndex++) {
+            Row row = sheet.createRow(rowIndex);
+            for (int colIndex = 0; colIndex < array[rowIndex].length; colIndex++) {
+                Cell cell = row.createCell(colIndex);
+                cell.setCellValue(array[rowIndex][colIndex]);
+            }
+        }
     }
 
 
