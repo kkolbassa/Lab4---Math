@@ -9,9 +9,7 @@ import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,14 +17,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MathManipulation {
     ArrayList<double[]> samples = new ArrayList<>();
 
-    public void setData(String filePath){
+    public void setData(String filePath) throws IOException {
         ArrayList<Double> x = new ArrayList<>();
         ArrayList<Double> y = new ArrayList<>();
         ArrayList<Double> z = new ArrayList<>();
 
         int sheetNumber = 5;
 
-        try (FileInputStream inputStream = new FileInputStream(filePath)) {
+            FileInputStream inputStream = new FileInputStream(filePath);
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
@@ -54,12 +52,12 @@ public class MathManipulation {
                     z.add(cell3.getNumericCellValue());
                 }
             }
-            samples.add(x.stream().mapToDouble(Double::doubleValue).toArray());
-            samples.add(y.stream().mapToDouble(Double::doubleValue).toArray());
-            samples.add(z.stream().mapToDouble(Double::doubleValue).toArray());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+            if(x.isEmpty()||y.isEmpty()||z.isEmpty())throw new IOException("Данных не хватает");
+            else {
+                samples.add(x.stream().mapToDouble(Double::doubleValue).toArray());
+                samples.add(y.stream().mapToDouble(Double::doubleValue).toArray());
+                samples.add(z.stream().mapToDouble(Double::doubleValue).toArray());
+            }
     }
 
     //1.	Рассчитать среднее геометрическое для каждой выборки
@@ -173,6 +171,8 @@ public class MathManipulation {
         fileOut.close();
 
         workbook.close();
+
+        if(covXY==null||covXZ==null||covYZ==null) throw new IOException("Неправильные данные для рассчета ковариации");
 
     }
     public void writeArrayToExcel(double[][] array, Workbook workbook, String sheetname) {
