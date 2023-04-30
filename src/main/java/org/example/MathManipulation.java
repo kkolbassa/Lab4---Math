@@ -17,14 +17,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MathManipulation {
     private ArrayList<double[]> samples = new ArrayList<>();
 
-    public void setData(String filePath) throws IOException {
+    public void setData(String s) throws IOException {
         ArrayList<Double> x = new ArrayList<>();
         ArrayList<Double> y = new ArrayList<>();
         ArrayList<Double> z = new ArrayList<>();
 
         int sheetNumber = 5;
 
-            FileInputStream inputStream = new FileInputStream(filePath);
+            InputStream inputStream = MathManipulation.class.getClassLoader().getResourceAsStream("ДЗ4.xlsx");
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 

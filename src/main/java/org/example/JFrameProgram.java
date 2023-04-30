@@ -6,7 +6,12 @@ package org.example;/*
 
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 /**
  *
@@ -113,7 +118,8 @@ public class JFrameProgram extends javax.swing.JFrame {
         else if (jLabelExport.getText().equals("Данные выгружены")||jLabelExport.getText().equals("Данные выгружены частично")) JOptionPane.showMessageDialog (null, "Данные уже выгружены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
             else {
                 try {
-                    mm.writeResultsToExcel("./data/Result.xlsx");
+                    mm.writeResultsToExcel("./Result.xlsx");
+                    //mm.writeResultsToExcel(".\\src\\main\\resources\\data\\Result.xlsx");
                     jLabelExport.setText("Данные выгружены");
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog (null, e.getMessage(), "Oшибка", JOptionPane.ERROR_MESSAGE);
@@ -127,7 +133,7 @@ public class JFrameProgram extends javax.swing.JFrame {
         if (jLabelImport.getText().equals("Данные загружены")) JOptionPane.showMessageDialog (null, "Данные уже получены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
         else {
             try {
-                mm.setData("./data/ДЗ4.xlsx");
+                mm.setData("/ДЗ4.xlsx");
                 jLabelImport.setText("Данные загружены");
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage(), "Oшибка", JOptionPane.ERROR_MESSAGE);
