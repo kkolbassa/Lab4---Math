@@ -111,14 +111,13 @@ public class JFrameProgram extends javax.swing.JFrame {
 
     private void jButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonExportActionPerformed
         if (jLabelImport.getText().equals("Данные не загружены")) JOptionPane.showMessageDialog (null, "Данные еще не получены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
-        else if (jLabelExport.getText().equals("Данные выгружены")||jLabelExport.getText().equals("Данные выгружены частично")) JOptionPane.showMessageDialog (null, "Данные уже выгружены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
+        else if (jLabelExport.getText().equals("Данные выгружены")) JOptionPane.showMessageDialog (null, "Данные уже выгружены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
             else {
                 try {
                     xm.writeResultsToExcel("./Result.xlsx");
                     jLabelExport.setText("Данные выгружены");
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog (null, e.getMessage(), "Oшибка", JOptionPane.ERROR_MESSAGE);
-                    if (e.getMessage().equals("Неправильные данные для рассчета ковариации")) jLabelExport.setText("Данные выгружены частично");
                 }
             }
 

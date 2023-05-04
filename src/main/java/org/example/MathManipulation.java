@@ -7,6 +7,7 @@ import org.apache.commons.math3.stat.interval.ConfidenceInterval;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -39,12 +40,9 @@ public class MathManipulation {
         return StatUtils.max(array) - StatUtils.min(array);
     }
     //5.	Рассчитать коэффициенты ковариации для всех пар случайных чисел
-    public double[][] calculateCovariance(double[] x, double[] y) {
-        if(x.length==y.length){
-            Covariance covariance = new Covariance(new double[][] {x, y});
-            return covariance.getCovarianceMatrix().getData();
-        }
-        return null;
+    public double calculateCovariance(double[] x, double[] y) {
+            Covariance covariance = new Covariance();
+            return covariance.covariance(x,y);
     }
     //6.	Рассчитать количество элементов в каждой выборке
     public int calculateArrayLength(double[] array) {

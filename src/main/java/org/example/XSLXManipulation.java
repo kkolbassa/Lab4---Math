@@ -96,13 +96,18 @@ public class XSLXManipulation {
         for (int i = 0; i < 11; i++) {
             sheet.autoSizeColumn(i);
         }
+        Sheet sheetCov = workbook.createSheet("Results Covariance");
+        nameIndex=0;
+        Row row = sheetCov.createRow(nameIndex);
+        row.createCell(0).setCellValue("Cov XY");
+        row.createCell(1).setCellValue("Cov XZ");
+        row.createCell(2).setCellValue("Cov YZ");
+        nameIndex++;
+        Row rowData = sheetCov.createRow(nameIndex);
 
-        double[][] covXY = mm.calculateCovariance(mm.getSamples().get(0), mm.getSamples().get(1));
-        if(covXY!=null) writeArrayToExcel(covXY,workbook,"Cov XY");
-        double[][] covXZ = mm.calculateCovariance(mm.getSamples().get(0), mm.getSamples().get(2));
-        if(covXY!=null) writeArrayToExcel(covXZ,workbook,"Cov XZ");
-        double[][] covYZ = mm.calculateCovariance(mm.getSamples().get(1), mm.getSamples().get(2));
-        if(covXY!=null) writeArrayToExcel(covYZ,workbook,"Cov YZ");
+        rowData.createCell(0).setCellValue(mm.calculateCovariance(mm.getSamples().get(0), mm.getSamples().get(1)));
+        rowData.createCell(1).setCellValue(mm.calculateCovariance(mm.getSamples().get(0), mm.getSamples().get(2)));
+        rowData.createCell(2).setCellValue(mm.calculateCovariance(mm.getSamples().get(1), mm.getSamples().get(2)));
 
         FileOutputStream fileOut = new FileOutputStream(filePath);
         workbook.write(fileOut);
@@ -110,17 +115,5 @@ public class XSLXManipulation {
 
         workbook.close();
 
-        if(covXY==null||covXZ==null||covYZ==null) throw new IOException("Неправильные данные для рассчета ковариации");
-
-    }
-    public void writeArrayToExcel(double[][] array, Workbook workbook, String sheetname) {
-        Sheet sheet = workbook.createSheet(sheetname);
-        for (int rowIndex = 0; rowIndex < array.length; rowIndex++) {
-            Row row = sheet.createRow(rowIndex);
-            for (int colIndex = 0; colIndex < array[rowIndex].length; colIndex++) {
-                Cell cell = row.createCell(colIndex);
-                cell.setCellValue(array[rowIndex][colIndex]);
-            }
-        }
     }
 }
