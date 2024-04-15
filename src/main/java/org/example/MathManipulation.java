@@ -7,19 +7,25 @@ import org.apache.commons.math3.stat.interval.ConfidenceInterval;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class MathManipulation {
-    private ArrayList<double[]> samples = new ArrayList<>();
+    private ArrayList<DataSheet> dataSheets = new ArrayList<>();
 
-    public ArrayList<double[]> getSamples() {
-        return samples;
+    public ArrayList<DataSheet> getDataSheets() {
+        return dataSheets;
+    }
+    public DataSheet getDataSheets(int index) {
+        return dataSheets.get(index);
     }
 
-    public void setSamples(ArrayList<double[]> samples) {
-        this.samples = samples;
+    public void setDataSheets(ArrayList<DataSheet> dataSheets) {
+        this.dataSheets = dataSheets;
+    }
+
+    public void addSheet(DataSheet dataSheet) {
+        dataSheets.add(dataSheet);
     }
 
     //1.	Рассчитать среднее геометрическое для каждой выборки

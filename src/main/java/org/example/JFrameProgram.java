@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class JFrameProgram extends javax.swing.JFrame {
 
-    private static XSLXManipulation xm = new XSLXManipulation();
+    private XSLXManipulation xm = new XSLXManipulation();
     public JFrameProgram() {
         initComponents();
     }
@@ -127,7 +127,7 @@ public class JFrameProgram extends javax.swing.JFrame {
         if (jLabelImport.getText().equals("Данные загружены")) JOptionPane.showMessageDialog (null, "Данные уже получены!", "Oшибка", JOptionPane.ERROR_MESSAGE);
         else {
             try {
-                xm.setData("/ДЗ4.xlsx");
+                xm.setData("ДЗ4.xlsx");
                 jLabelImport.setText("Данные загружены");
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage(), "Oшибка", JOptionPane.ERROR_MESSAGE);
