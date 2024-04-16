@@ -20,7 +20,6 @@ public class SampleCreator {
 
         if (!file.exists()) {
 
-            String filePath = path;
             int numberOfSheets = new Random().nextInt(100) + 1; // Рандомное количество листов от 1 до 100
             Workbook workbook = new XSSFWorkbook();
             for (int i = 0; i < numberOfSheets; i++) {
