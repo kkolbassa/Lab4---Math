@@ -3,10 +3,7 @@ package org.example;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -18,6 +15,7 @@ public class XSLXManipulation {
     private SampleCreator sc = new SampleCreator();
 
     public void setData(String path) throws IOException {
+        mm = new MathManipulation();
         InputStream inputStream;
         if(path.equals("ДЗ4.xlsx")){
             inputStream = MathManipulation.class.getClassLoader().getResourceAsStream("ДЗ4.xlsx");
@@ -121,7 +119,6 @@ public class XSLXManipulation {
                 sheet.autoSizeColumn(i);
             }
         }
-
         FileOutputStream fileOut = new FileOutputStream(filePath);
         workbook.write(fileOut);
         fileOut.close();
